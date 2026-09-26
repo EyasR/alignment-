@@ -1,0 +1,3486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coding with Chester — AI Learning Alignment</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+:root{
+  --bg:#060910;
+  --panel:#0b111d;
+  --panel2:#0e1725;
+  --line:#243249;
+  --green:#6cffb0;
+  --blue:#6ea8ff;
+  --purple:#d66cff;
+  --yellow:#ffe66c;
+  --red:#ff7c9b;
+  --text:#e9f0f8;
+  --muted:#7f8da3;
+  --dim:#4f5c70;
+}
+
+*{box-sizing:border-box}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  margin:0;
+  padding:30px 18px 90px;
+  min-height:100vh;
+  color:var(--text);
+  font-family:"Space Grotesk",sans-serif;
+  background:
+    radial-gradient(circle at 50% -10%,rgba(110,168,255,.13),transparent 38%),
+    linear-gradient(rgba(108,255,176,.022) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(108,255,176,.022) 1px,transparent 1px),
+    var(--bg);
+  background-size:auto,40px 40px,40px 40px;
+}
+
+body:before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:20;
+  background:repeating-linear-gradient(
+    to bottom,
+    rgba(255,255,255,.012) 0 1px,
+    transparent 1px 4px
+  );
+}
+
+button,input{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+.shell{
+  max-width:1450px;
+  margin:auto;
+}
+
+/* --------------------------------------------------
+   HEADER
+-------------------------------------------------- */
+
+.header{
+  display:flex;
+  justify-content:space-between;
+  gap:30px;
+  align-items:flex-start;
+  margin-bottom:25px;
+}
+
+.brand,
+.kicker,
+.micro,
+.value,
+.status,
+.code,
+.mini-title{
+  font-family:"DM Mono",monospace;
+}
+
+.brand{
+  font-size:11px;
+  letter-spacing:.18em;
+  color:var(--green);
+  margin-bottom:12px;
+}
+
+h1{
+  font-size:clamp(42px,6vw,72px);
+  line-height:.9;
+  letter-spacing:-.06em;
+  margin:0;
+}
+
+.subtitle{
+  max-width:800px;
+  color:var(--muted);
+  line-height:1.65;
+  font-size:15px;
+  margin:18px 0 0;
+}
+
+.status{
+  white-space:nowrap;
+  font-size:10px;
+  color:var(--green);
+  border:1px solid #244535;
+  border-radius:99px;
+  padding:9px 12px;
+}
+
+.dot{
+  display:inline-block;
+  width:7px;
+  height:7px;
+  background:var(--green);
+  border-radius:50%;
+  box-shadow:0 0 12px var(--green);
+  margin-right:7px;
+}
+
+/* --------------------------------------------------
+   PANELS & GENERAL COLLAPSIBLES
+-------------------------------------------------- */
+
+.panel{
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.025),transparent 45%),
+    var(--panel);
+  border:1px solid var(--line);
+  border-radius:18px;
+  box-shadow:
+    0 25px 70px rgba(0,0,0,.2),
+    inset 0 1px rgba(255,255,255,.025);
+}
+
+details.panel{
+  transition: all 0.2s ease;
+}
+
+details.panel > summary{
+  list-style:none;
+  cursor:pointer;
+  user-select:none;
+  outline:none;
+}
+
+details.panel > summary::-webkit-details-marker{
+  display:none;
+}
+
+details.panel > .panel-body{
+  margin-top:15px;
+}
+
+.panel-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px;
+}
+
+.panel-summary-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:16px;
+}
+
+.toggle-badge{
+  font-family:"DM Mono",monospace;
+  font-size:9px;
+  letter-spacing:.08em;
+  color:var(--green);
+  border:1px solid #35654d;
+  background:#6cffb00c;
+  padding:6px 12px;
+  border-radius:6px;
+  white-space:nowrap;
+  transition:.2s;
+  flex-shrink:0;
+}
+
+details.panel[open] > summary .toggle-badge::after{
+  content:"COLLAPSE −";
+}
+
+details.panel:not([open]) > summary .toggle-badge::after{
+  content:"EXPAND +";
+}
+
+details.panel > summary:hover .toggle-badge{
+  border-color:var(--green);
+  box-shadow:0 0 10px rgba(108,255,176,.2);
+}
+
+.kicker{
+  font-size:10px;
+  letter-spacing:.13em;
+  color:var(--muted);
+}
+
+.value{
+  font-size:10px;
+  color:var(--green);
+}
+
+/* --------------------------------------------------
+   PHILOSOPHY + RADAR TOP DECK
+-------------------------------------------------- */
+
+.top-deck{
+  display:grid;
+  grid-template-columns:minmax(0,1.45fr) minmax(360px,.75fr);
+  gap:16px;
+  margin-bottom:16px;
+}
+
+.philosophy-panel{
+  padding:24px;
+}
+
+.philosophy-intro{
+  max-width:750px;
+  margin-bottom:18px;
+}
+
+.philosophy-intro h2{
+  margin:5px 0 7px;
+  font-size:25px;
+  letter-spacing:-.04em;
+}
+
+.philosophy-intro p{
+  margin:0;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.6;
+}
+
+.preset-grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:8px;
+}
+
+.preset{
+  min-height:72px;
+  padding:12px;
+  text-align:left;
+  border:1px solid #26344a;
+  background:#09101a;
+  border-radius:10px;
+  transition:.2s;
+}
+
+.preset strong{
+  display:block;
+  color:#d9e4f2;
+  font-size:11px;
+  margin-bottom:5px;
+}
+
+.preset span{
+  color:var(--muted);
+  font:8px "DM Mono",monospace;
+  line-height:1.4;
+}
+
+.preset:hover{
+  border-color:var(--green);
+  transform:translateY(-1px);
+}
+
+.action-row{
+  display:flex;
+  gap:8px;
+  margin-top:12px;
+}
+
+.action-row button{
+  flex:1;
+}
+
+button{
+  border:1px solid #2a3850;
+  background:#0a101a;
+  color:#9aa8bc;
+  border-radius:8px;
+  padding:10px 12px;
+  font:9px "DM Mono",monospace;
+}
+
+button:hover{
+  border-color:var(--green);
+  color:var(--green);
+}
+
+.primary{
+  border-color:#35654d;
+  color:var(--green);
+  background:#6cffb008;
+}
+
+/* Radar */
+
+.radar-panel{
+  padding:20px;
+  min-height:100%;
+}
+
+.radar-content{
+  display:grid;
+  grid-template-columns:220px 1fr;
+  gap:12px;
+  align-items:center;
+  min-height:260px;
+}
+
+.radar-wrap{
+  position:relative;
+  width:220px;
+  height:220px;
+  display:grid;
+  place-items:center;
+}
+
+#radar{
+  width:220px;
+  height:220px;
+  overflow:visible;
+}
+
+.gridline{
+  fill:none;
+  stroke:#1d293b;
+  stroke-width:1;
+}
+
+.axis{
+  stroke:#243249;
+  stroke-width:1;
+}
+
+.shape{
+  fill:#6cffb014;
+  stroke:var(--green);
+  stroke-width:2;
+  filter:drop-shadow(0 0 8px #6cffb080);
+}
+
+.node{
+  fill:var(--green);
+  stroke:#071018;
+  stroke-width:3;
+  filter:drop-shadow(0 0 7px #6cffb0);
+}
+
+.axis-label{
+  fill:#8290a5;
+  font:8px "DM Mono",monospace;
+  letter-spacing:.04em;
+}
+
+.radar-center{
+  position:absolute;
+  text-align:center;
+  width:110px;
+  pointer-events:none;
+}
+
+.radar-center .kicker{
+  color:var(--green);
+  font-size:7px;
+}
+
+.center-name{
+  font-size:13px;
+  font-weight:700;
+  line-height:1.05;
+  margin-top:5px;
+}
+
+.center-sub{
+  font:7px "DM Mono",monospace;
+  color:#58667b;
+  margin-top:6px;
+}
+
+.profile-summary{
+  border-left:1px solid #1e2b3e;
+  padding-left:16px;
+}
+
+.profile-summary .kicker{
+  color:var(--green);
+}
+
+.profile-summary h2{
+  font-size:21px;
+  line-height:1.05;
+  margin:7px 0 8px;
+}
+
+.profile-summary p{
+  color:var(--muted);
+  font-size:10px;
+  line-height:1.55;
+  margin:0;
+}
+
+/* --------------------------------------------------
+   SLIDER LAB & COLLAPSIBLES
+-------------------------------------------------- */
+
+details.controls-panel{
+  padding:25px;
+  margin-bottom:16px;
+}
+
+.controls-heading{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  margin-bottom:12px;
+}
+
+details.controls-panel[open] .controls-heading{
+  margin-bottom:22px;
+}
+
+.controls-heading h2{
+  font-size:26px;
+  letter-spacing:-.04em;
+  margin:5px 0 0;
+}
+
+.controls-heading-right{
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+
+.controls-heading p{
+  max-width:600px;
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.55;
+  margin:0;
+  text-align:right;
+}
+
+/* Sub-sections details styling */
+
+details.control-section{
+  padding:18px 0 10px;
+  border-top:1px solid #1c283a;
+  margin-top:10px;
+}
+
+details.control-section:first-of-type{
+  border-top:1px solid #1c283a;
+  padding-top:18px;
+}
+
+summary.control-section-title{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  cursor:pointer;
+  user-select:none;
+  list-style:none;
+  padding:4px 0;
+  outline:none;
+}
+
+summary.control-section-title::-webkit-details-marker{
+  display:none;
+}
+
+summary.control-section-title h3{
+  margin:0;
+  font-size:16px;
+  transition:color .2s;
+}
+
+summary.control-section-title p{
+  margin:2px 0 0;
+  color:var(--muted);
+  font-size:10px;
+}
+
+summary.control-section-title:hover h3{
+  color:var(--green);
+}
+
+.sub-toggle{
+  font-family:"DM Mono",monospace;
+  font-size:10px;
+  color:var(--muted);
+  transition:transform .25s ease, color .25s ease;
+  margin-left:12px;
+}
+
+details.control-section[open] > summary .sub-toggle,
+details.scenario[open] > summary .sub-toggle{
+  color:var(--green);
+  transform:rotate(90deg);
+}
+
+details.control-section:not([open]) > summary .sub-toggle,
+details.scenario:not([open]) > summary .sub-toggle{
+  transform:rotate(0deg);
+}
+
+/* Sliders */
+
+.slider-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:4px 30px;
+  padding-top:10px;
+}
+
+.boundary-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:0 25px;
+  padding-top:10px;
+}
+
+.slider{
+  margin:12px 0;
+}
+
+.slider-title{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  font-size:11px;
+  font-weight:600;
+}
+
+.slider-desc{
+  font-size:9px;
+  color:var(--muted);
+  line-height:1.45;
+  margin:4px 0 8px;
+}
+
+.ends{
+  display:flex;
+  justify-content:space-between;
+  color:#59677c;
+  font:8px "DM Mono",monospace;
+  margin-bottom:6px;
+}
+
+input[type=range]{
+  width:100%;
+  appearance:none;
+  height:4px;
+  background:#1b2739;
+  border-radius:10px;
+  outline:none;
+}
+
+input[type=range]::-webkit-slider-thumb{
+  appearance:none;
+  width:15px;
+  height:15px;
+  border-radius:50%;
+  background:var(--green);
+  border:3px solid #08101a;
+  box-shadow:0 0 13px #6cffb080;
+}
+
+input[type=range]::-moz-range-thumb{
+  width:12px;
+  height:12px;
+  border-radius:50%;
+  background:var(--green);
+  border:3px solid #08101a;
+}
+
+/* --------------------------------------------------
+   LOWER GRID
+-------------------------------------------------- */
+
+.lower-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+
+.info{
+  padding:24px;
+}
+
+.info h2{
+  font-size:23px;
+  letter-spacing:-.04em;
+  margin:4px 0 8px;
+}
+
+.body-copy{
+  font-size:11px;
+  line-height:1.6;
+  color:var(--muted);
+  margin:0;
+}
+
+/* --------------------------------------------------
+   ROLE
+-------------------------------------------------- */
+
+.role{
+  margin-top:25px;
+}
+
+.track{
+  height:7px;
+  background:#1b2739;
+  border-radius:20px;
+  position:relative;
+  margin:38px 0 18px;
+}
+
+.track-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--blue),var(--purple),var(--green));
+  border-radius:20px;
+}
+
+.marker{
+  position:absolute;
+  top:50%;
+  left:50%;
+  width:20px;
+  height:20px;
+  border-radius:50%;
+  background:var(--green);
+  border:4px solid var(--panel);
+  box-shadow:0 0 18px #6cffb0;
+  transform:translate(-50%,-50%);
+  transition:left .35s;
+}
+
+.role-labels{
+  display:flex;
+  justify-content:space-between;
+  color:#65748a;
+  font:8px "DM Mono",monospace;
+}
+
+.role-box{
+  margin-top:20px;
+  padding:14px;
+  border:1px solid #233149;
+  border-radius:10px;
+}
+
+.role-box strong{
+  font:11px "DM Mono",monospace;
+  color:var(--green);
+}
+
+.role-box p{
+  font-size:10px;
+  color:var(--muted);
+  line-height:1.55;
+  margin:6px 0 0;
+}
+
+/* --------------------------------------------------
+   INSIGHTS
+-------------------------------------------------- */
+
+.insights{
+  display:grid;
+  gap:8px;
+  margin-top:15px;
+}
+
+.insight{
+  padding:10px 11px;
+  border:1px solid #1e2b3e;
+  background:#09101a;
+  border-radius:9px;
+  color:#aebbd0;
+  font-size:10px;
+  line-height:1.5;
+}
+
+.insight b{
+  color:var(--green);
+  font-weight:500;
+}
+
+/* --------------------------------------------------
+   BOUNDARIES SUMMARY
+-------------------------------------------------- */
+
+.boundary{
+  margin-top:18px;
+}
+
+.boundary-row{
+  display:grid;
+  grid-template-columns:1fr 100px;
+  gap:14px;
+  align-items:center;
+  margin:13px 0;
+}
+
+.boundary-name{
+  font-size:10px;
+}
+
+.boundary-desc{
+  font-size:8px;
+  color:var(--muted);
+  margin-top:3px;
+}
+
+.bar{
+  height:5px;
+  background:#192437;
+  border-radius:20px;
+  overflow:hidden;
+}
+
+.bar i{
+  display:block;
+  height:100%;
+  background:linear-gradient(
+    90deg,
+    var(--blue),
+    var(--purple),
+    var(--green)
+  );
+  border-radius:inherit;
+}
+
+.bar-value{
+  text-align:right;
+  color:var(--green);
+  font:8px "DM Mono",monospace;
+  margin-top:3px;
+}
+
+/* --------------------------------------------------
+   PRIORITIES
+-------------------------------------------------- */
+
+.priorities{
+  display:grid;
+  gap:10px;
+  margin-top:18px;
+}
+
+.priority{
+  display:grid;
+  grid-template-columns:145px 1fr 30px;
+  gap:10px;
+  align-items:center;
+}
+
+.priority label{
+  font-size:10px;
+  color:#aab6c8;
+}
+
+.priority span{
+  font:8px "DM Mono",monospace;
+  color:var(--green);
+  text-align:right;
+}
+
+/* --------------------------------------------------
+   SCENARIOS
+-------------------------------------------------- */
+
+details.scenario{
+  margin-top:18px;
+  border:1px solid #26344a;
+  border-radius:12px;
+  overflow:hidden;
+}
+
+summary.scenario-head{
+  padding:13px;
+  background:#0b1421;
+  cursor:pointer;
+  user-select:none;
+  list-style:none;
+  outline:none;
+}
+
+summary.scenario-head::-webkit-details-marker{
+  display:none;
+}
+
+.scenario-head-content{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.scenario-head .kicker{
+  color:var(--yellow);
+}
+
+.scenario-head h3{
+  font-size:14px;
+  line-height:1.25;
+  margin:5px 0 0;
+}
+
+.scenario-body{
+  padding:5px 13px;
+}
+
+.option{
+  display:flex;
+  align-items:flex-start;
+  gap:9px;
+  padding:9px 0;
+  border-bottom:1px solid #182437;
+}
+
+.option:last-child{
+  border-bottom:0;
+}
+
+.option input{
+  accent-color:var(--green);
+  margin-top:3px;
+}
+
+.option label{
+  font-size:10px;
+  color:#aebbd0;
+  line-height:1.45;
+  cursor:pointer;
+}
+
+/* Scenario result */
+
+.scenario-result{
+  margin:10px 13px 13px;
+  padding:9px 11px;
+  border-left:2px solid var(--yellow);
+  background:#ffe66c05;
+  color:#8896aa;
+  font-size:9px;
+  line-height:1.5;
+}
+
+/* --------------------------------------------------
+   FOOTER
+-------------------------------------------------- */
+
+details.footer-panel{
+  margin-top:16px;
+  padding:26px;
+}
+
+details.footer-panel h2{
+  font-size:25px;
+  margin:5px 0 0;
+}
+
+details.footer-panel p{
+  max-width:950px;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.7;
+}
+
+.callout{
+  border-left:2px solid var(--green);
+  padding:13px 16px;
+  background:#6cffb006;
+  margin-top:20px;
+}
+
+.callout strong{
+  display:block;
+  font-size:11px;
+  margin-bottom:5px;
+}
+
+.callout span{
+  font-size:10px;
+  color:var(--muted);
+  line-height:1.55;
+}
+
+/* --------------------------------------------------
+   RESPONSIVE
+-------------------------------------------------- */
+
+@media(max-width:1150px){
+
+  .top-deck{
+    grid-template-columns:1fr;
+  }
+
+  .radar-content{
+    grid-template-columns:250px 1fr;
+  }
+
+  .radar-wrap{
+    width:250px;
+    height:250px;
+  }
+
+  #radar{
+    width:250px;
+    height:250px;
+  }
+
+  .boundary-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+
+@media(max-width:800px){
+
+  .slider-grid,
+  .lower-grid{
+    grid-template-columns:1fr;
+  }
+
+  .preset-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .controls-heading{
+    display:block;
+  }
+
+  .controls-heading-right{
+    margin-top:10px;
+    justify-content:space-between;
+  }
+
+  .controls-heading p{
+    text-align:left;
+  }
+
+  .radar-content{
+    grid-template-columns:1fr;
+    justify-items:center;
+  }
+
+  .profile-summary{
+    border-left:0;
+    border-top:1px solid #1e2b3e;
+    padding:15px 0 0;
+    text-align:center;
+  }
+
+  .radar-wrap{
+    width:240px;
+    height:240px;
+  }
+
+  #radar{
+    width:240px;
+    height:240px;
+  }
+}
+
+@media(max-width:560px){
+
+  body{
+    padding:18px 10px 60px;
+  }
+
+  .header{
+    display:block;
+  }
+
+  .status{
+    display:inline-block;
+    margin-top:18px;
+  }
+
+  h1{
+    font-size:43px;
+  }
+
+  .philosophy-panel,
+  .radar-panel,
+  details.controls-panel,
+  .info,
+  details.footer-panel{
+    padding:18px;
+  }
+
+  .preset-grid{
+    grid-template-columns:1fr;
+  }
+
+  .boundary-grid{
+    grid-template-columns:1fr;
+  }
+
+  .priority{
+    grid-template-columns:115px 1fr 30px;
+  }
+
+  .action-row{
+    flex-direction:column;
+  }
+
+  .radar-wrap{
+    width:220px;
+    height:220px;
+  }
+
+  #radar{
+    width:220px;
+    height:220px;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  *{
+    transition:none!important;
+    animation:none!important;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="shell">
+
+<!-- ==================================================
+     HEADER
+================================================== -->
+
+<header class="header">
+
+  <div>
+    <div class="brand">CODING WITH CHESTER // PARENT LAB</div>
+
+    <h1>
+      AI Learning<br>
+      Alignment
+    </h1>
+
+    <p class="subtitle">
+      AI doesn't have to be all-or-nothing. Explore the different choices
+      underneath the surface of "AI in education" and build a picture of
+      the learning environment you want for your child.
+    </p>
+  </div>
+
+  <div class="status">
+    <span class="dot"></span>
+    SYSTEM READY
+  </div>
+
+</header>
+
+
+<!-- ==================================================
+     TOP DECK
+================================================== -->
+
+<div class="top-deck">
+
+  <!-- PHILOSOPHY -->
+
+  <section class="panel philosophy-panel">
+
+    <div class="kicker">
+      01 // START WITH A PHILOSOPHY
+    </div>
+
+    <div class="philosophy-intro">
+
+      <h2>Where do you want to start?</h2>
+
+      <p>
+        These aren't "right" or "wrong" answers. Each starting point represents
+        a different philosophy for how AI could fit into a child's education.
+        Pick one to explore it, then adjust everything underneath.
+      </p>
+
+    </div>
+
+    <div class="preset-grid">
+
+      <button class="preset" data-preset="foundation">
+        <strong>FOUNDATIONS</strong>
+        <span>Fundamentals first</span>
+      </button>
+
+      <button class="preset" data-preset="socratic">
+        <strong>SOCRATIC AI</strong>
+        <span>AI guides, student thinks</span>
+      </button>
+
+      <button class="preset" data-preset="apprentice">
+        <strong>AI APPRENTICE</strong>
+        <span>Learn modern AI workflows</span>
+      </button>
+
+      <button class="preset" data-preset="builder">
+        <strong>AI BUILDER</strong>
+        <span>Build alongside AI</span>
+      </button>
+
+      <button class="preset" data-preset="native">
+        <strong>AI-NATIVE</strong>
+        <span>AI as a core medium</span>
+      </button>
+
+    </div>
+
+    <div class="action-row">
+
+      <button id="randomize" class="primary">
+        GENERATE PROFILE
+      </button>
+
+      <button id="reset">
+        RESET
+      </button>
+
+      <button id="copy">
+        COPY MY PROFILE
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- RADAR -->
+
+  <section class="panel radar-panel">
+
+    <div class="panel-head">
+      <span class="kicker">02 // PHILOSOPHY MAP</span>
+      <span class="value">LIVE</span>
+    </div>
+
+    <div class="radar-content">
+
+      <div class="radar-wrap">
+
+        <svg
+          id="radar"
+          viewBox="0 0 500 500"
+          role="img"
+          aria-label="AI learning profile radar chart"
+        >
+          <g id="grid"></g>
+          <g id="axes"></g>
+          <path id="shape" class="shape"></path>
+          <g id="nodes"></g>
+          <g id="labels"></g>
+        </svg>
+
+        <div class="radar-center">
+
+          <div class="kicker">
+            CURRENT PROFILE
+          </div>
+
+          <div
+            class="center-name"
+            id="centerName"
+          >
+            Guided AI Learner
+          </div>
+
+          <div
+            class="center-sub"
+            id="profileCode"
+          >
+            PROFILE // SOC-02
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="profile-summary">
+
+        <div class="kicker">
+          PROFILE SYNTHESIS
+        </div>
+
+        <h2 id="profileName">
+          Guided AI Learner
+        </h2>
+
+        <p id="profileDescription"></p>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</div>
+
+
+<!-- ==================================================
+     SLIDER LAB (COLLAPSIBLE MAIN PANEL)
+================================================== -->
+
+<details class="panel controls-panel" open>
+
+  <summary>
+    <div class="controls-heading">
+
+      <div>
+        <div class="kicker">
+          03 // TUNE YOUR PHILOSOPHY
+        </div>
+
+        <h2>
+          Adjust the underlying choices
+        </h2>
+      </div>
+
+      <div class="controls-heading-right">
+        <p>
+          There isn't one AI setting. These controls let you describe
+          how AI, learning, human guidance, and student responsibility
+          should interact.
+        </p>
+        <span class="toggle-badge"></span>
+      </div>
+
+    </div>
+  </summary>
+
+
+  <!-- CORE PHILOSOPHY (TOP SUB-MENU - OPEN BY DEFAULT) -->
+
+  <details class="control-section" open>
+
+    <summary class="control-section-title">
+
+      <div>
+        <h3>
+          AI Philosophy
+        </h3>
+
+        <p>
+          General attitudes toward AI in education
+        </p>
+      </div>
+
+      <span class="sub-toggle">▶</span>
+
+    </summary>
+
+    <div
+      class="slider-grid"
+      id="philosophy"
+    ></div>
+
+  </details>
+
+
+  <!-- AI BOUNDARIES (SUB-MENU - COLLAPSED BY DEFAULT) -->
+
+  <details class="control-section">
+
+    <summary class="control-section-title">
+
+      <div>
+        <h3>
+          AI Boundaries
+        </h3>
+
+        <p>
+          What should AI actually be allowed to do?
+        </p>
+      </div>
+
+      <span class="sub-toggle">▶</span>
+
+    </summary>
+
+    <div
+      class="boundary-grid"
+      id="boundaries"
+    ></div>
+
+  </details>
+
+
+  <!-- HUMAN GUIDANCE (SUB-MENU - COLLAPSED BY DEFAULT) -->
+
+  <details class="control-section">
+
+    <summary class="control-section-title">
+
+      <div>
+        <h3>
+          Instructor Relationship
+        </h3>
+
+        <p>
+          How much human structure should remain?
+        </p>
+      </div>
+
+      <span class="sub-toggle">▶</span>
+
+    </summary>
+
+    <div
+      class="slider-grid"
+      id="guidance"
+    ></div>
+
+  </details>
+
+</details>
+
+
+<!-- ==================================================
+     LOWER INFORMATION GRID
+================================================== -->
+
+<div class="lower-grid">
+
+
+  <!-- AI ROLE -->
+
+  <details class="panel info" open>
+
+    <summary>
+      <div class="panel-summary-head">
+        <div>
+          <div class="kicker">
+            04 // AI ROLE
+          </div>
+
+          <h2>
+            What role should AI play?
+          </h2>
+        </div>
+
+        <span class="toggle-badge"></span>
+      </div>
+
+      <p class="body-copy">
+        This combines how much AI you welcome with how much
+        responsibility you are comfortable giving it.
+      </p>
+    </summary>
+
+    <div class="panel-body">
+
+      <div class="role">
+
+        <div class="track">
+
+          <div
+            class="track-fill"
+            id="roleFill"
+          ></div>
+
+          <div
+            class="marker"
+            id="roleMarker"
+          ></div>
+
+        </div>
+
+        <div class="role-labels">
+          <span>EXPLAINER</span>
+          <span>TUTOR</span>
+          <span>COLLABORATOR</span>
+          <span>PARTNER</span>
+          <span>CREATOR</span>
+        </div>
+
+        <div class="role-box">
+
+          <strong id="roleName">
+            TUTOR
+          </strong>
+
+          <p id="roleDescription"></p>
+
+        </div>
+
+      </div>
+
+      <div
+        class="kicker"
+        style="margin-top:28px"
+      >
+        WHAT THIS SUGGESTS
+      </div>
+
+      <div
+        class="insights"
+        id="insights"
+      ></div>
+
+    </div>
+
+  </details>
+
+
+  <!-- BOUNDARY SUMMARY -->
+
+  <details class="panel info" open>
+
+    <summary>
+      <div class="panel-summary-head">
+        <div>
+          <div class="kicker">
+            05 // AI BOUNDARIES
+          </div>
+
+          <h2>
+            How much autonomy does AI get?
+          </h2>
+        </div>
+
+        <span class="toggle-badge"></span>
+      </div>
+
+      <p class="body-copy">
+        These describe the specific jobs you are comfortable
+        delegating to AI — not simply how comfortable you are
+        with AI itself.
+      </p>
+    </summary>
+
+    <div class="panel-body">
+
+      <div
+        class="boundary"
+        id="boundarySummary"
+      ></div>
+
+    </div>
+
+  </details>
+
+
+  <!-- PRIORITIES -->
+
+  <details class="panel info" open>
+
+    <summary>
+      <div class="panel-summary-head">
+        <div>
+          <div class="kicker">
+            06 // EDUCATIONAL PRIORITIES
+          </div>
+
+          <h2>
+            What are you actually optimizing for?
+          </h2>
+        </div>
+
+        <span class="toggle-badge"></span>
+      </div>
+
+      <p class="body-copy">
+        Distribute 100 points across the outcomes you care
+        about most. The shape matters more than a single score.
+      </p>
+    </summary>
+
+    <div class="panel-body">
+
+      <div
+        class="priorities"
+        id="priorities"
+      ></div>
+
+      <div
+        class="value"
+        style="margin-top:10px"
+        id="priorityTotal"
+      >
+        TOTAL // 100
+      </div>
+
+    </div>
+
+  </details>
+
+
+  <!-- SCENARIOS -->
+
+  <details class="panel info" open>
+
+    <summary>
+      <div class="panel-summary-head">
+        <div>
+          <div class="kicker">
+            07 // REAL-WORLD SCENARIOS
+          </div>
+
+          <h2>
+            Where does your philosophy show up?
+          </h2>
+        </div>
+
+        <span class="toggle-badge"></span>
+      </div>
+
+      <p class="body-copy">
+        Sometimes a scenario reveals a preference more clearly
+        than a slider. These choices feed into your profile.
+      </p>
+    </summary>
+
+    <div class="panel-body">
+
+      <!-- Scenario 1 -->
+
+      <details class="scenario" open>
+
+        <summary class="scenario-head">
+          <div class="scenario-head-content">
+            <div>
+              <div class="kicker">
+                SCENARIO 01
+              </div>
+
+              <h3>
+                Your child is stuck on a coding problem.
+              </h3>
+            </div>
+
+            <span class="sub-toggle">▶</span>
+          </div>
+        </summary>
+
+        <div
+          class="scenario-body"
+          id="scenarioOptions"
+        >
+
+          <div class="option">
+            <input
+              type="radio"
+              name="scenario"
+              value="independent"
+              id="s1"
+            >
+            <label for="s1">
+              Keep working independently for a while longer.
+            </label>
+          </div>
+
+          <div class="option">
+            <input
+              type="radio"
+              name="scenario"
+              value="instructor"
+              id="s2"
+            >
+            <label for="s2">
+              Ask the instructor for guidance.
+            </label>
+          </div>
+
+          <div class="option">
+            <input
+              type="radio"
+              name="scenario"
+              value="hint"
+              id="s3"
+              checked
+            >
+            <label for="s3">
+              Ask AI for a hint or question that helps them continue.
+            </label>
+          </div>
+
+          <div class="option">
+            <input
+              type="radio"
+              name="scenario"
+              value="explain"
+              id="s4"
+            >
+            <label for="s4">
+              Ask AI to explain the concept they're missing.
+            </label>
+          </div>
+
+          <div class="option">
+            <input
+              type="radio"
+              name="scenario"
+              value="solution"
+              id="s5"
+            >
+            <label for="s5">
+              Let AI provide a solution or example and study it together.
+            </label>
+          </div>
+
+        </div>
+
+        <div
+          class="scenario-result"
+          id="scenarioResult1"
+        ></div>
+
+      </details>
+
+
+      <!-- Scenario 2 -->
+
+      <details class="scenario" open>
+
+        <summary class="scenario-head">
+          <div class="scenario-head-content">
+            <div>
+              <div class="kicker">
+                SCENARIO 02
+              </div>
+
+              <h3>
+                AI generated code your child doesn't fully understand.
+              </h3>
+            </div>
+
+            <span class="sub-toggle">▶</span>
+          </div>
+        </summary>
+
+        <div class="scenario-body">
+
+          <div class="option">
+
+            <input
+              type="radio"
+              name="scenario2"
+              value="reject"
+              id="a1"
+            >
+
+            <label for="a1">
+              Don't use it until the student understands it.
+            </label>
+
+          </div>
+
+          <div class="option">
+
+            <input
+              type="radio"
+              name="scenario2"
+              value="explain"
+              id="a2"
+              checked
+            >
+
+            <label for="a2">
+              Have AI explain it, then decide whether to use it.
+            </label>
+
+          </div>
+
+          <div class="option">
+
+            <input
+              type="radio"
+              name="scenario2"
+              value="test"
+              id="a3"
+            >
+
+            <label for="a3">
+              Use it if the student can test, modify, and evaluate it.
+            </label>
+
+          </div>
+
+          <div class="option">
+
+            <input
+              type="radio"
+              name="scenario2"
+              value="direct"
+              id="a4"
+            >
+
+            <label for="a4">
+              Understanding every line isn't necessary if the student
+              can direct the system effectively.
+            </label>
+
+          </div>
+
+        </div>
+
+        <div
+          class="scenario-result"
+          id="scenarioResult2"
+        ></div>
+
+      </details>
+
+    </div>
+
+  </details>
+
+</div>
+
+
+<!-- ==================================================
+     CHESTER TRANSLATION
+================================================== -->
+
+<details class="panel footer-panel" open>
+
+  <summary>
+    <div class="panel-summary-head">
+      <div>
+        <div class="kicker">
+          08 // CODING WITH CHESTER TRANSLATION
+        </div>
+
+        <h2>
+          What does this mean for learning?
+        </h2>
+      </div>
+
+      <span class="toggle-badge"></span>
+    </div>
+  </summary>
+
+  <div class="panel-body">
+
+    <p id="chesterText"></p>
+
+    <div class="callout">
+
+      <strong>
+        THERE IS NO SINGLE RIGHT SETTING.
+      </strong>
+
+      <span>
+        Families have different goals, experiences, and expectations
+        around AI. This profile is not a grade. It is a way to articulate
+        what kind of learning environment you want — so instruction can
+        be built around it.
+      </span>
+
+    </div>
+
+  </div>
+
+</details>
+
+</div>
+
+
+<script>
+
+/* ==================================================
+   DATA
+================================================== */
+
+const dims = [
+
+  {
+    id:"familiarity",
+    name:"AI FAMILIARITY",
+    desc:"How comfortable are you with AI being part of your child's education?",
+    left:"CAUTIOUS",
+    right:"VERY COMFORTABLE"
+  },
+
+  {
+    id:"literacy",
+    name:"AI LITERACY",
+    desc:"How important is it that your child understands AI, its limits, and how to evaluate it?",
+    left:"OPTIONAL",
+    right:"ESSENTIAL"
+  },
+
+  {
+    id:"tool",
+    name:"AI AS A TOOL",
+    desc:"How strongly do you view AI as a normal tool children should learn to use?",
+    left:"TRADITIONAL",
+    right:"CORE TOOL"
+  },
+
+  {
+    id:"partner",
+    name:"AI AS LEARNING PARTNER",
+    desc:"How comfortable are you with AI actively participating in the learning process?",
+    left:"MINIMAL",
+    right:"ACTIVE"
+  }
+
+];
+
+
+const boundaryDefs = [
+
+  {
+    id:"explain",
+    name:"Explain concepts",
+    desc:"Teach or clarify unfamiliar ideas."
+  },
+
+  {
+    id:"question",
+    name:"Ask guiding questions",
+    desc:"Use Socratic questions instead of answers."
+  },
+
+  {
+    id:"hint",
+    name:"Give hints",
+    desc:"Provide a nudge when the student is stuck."
+  },
+
+  {
+    id:"example",
+    name:"Show examples",
+    desc:"Provide worked examples or patterns."
+  },
+
+  {
+    id:"debug",
+    name:"Debug code",
+    desc:"Find errors and explain what is happening."
+  },
+
+  {
+    id:"suggest",
+    name:"Suggest code",
+    desc:"Recommend code or implementation approaches."
+  },
+
+  {
+    id:"generate",
+    name:"Generate code",
+    desc:"Write meaningful portions of the student's code."
+  },
+
+  {
+    id:"project",
+    name:"Generate projects",
+    desc:"Create substantial project structures or implementations."
+  }
+
+];
+
+
+const state = {
+
+  familiarity:55,
+  literacy:72,
+  tool:60,
+  partner:48,
+
+  boundaries:{
+    explain:90,
+    question:92,
+    hint:88,
+    example:70,
+    debug:62,
+    suggest:35,
+    generate:22,
+    project:8
+  },
+
+  guidance:60,
+
+  priorities:{
+    problem:24,
+    fundamentals:22,
+    creativity:15,
+    ai:16,
+    projects:13,
+    persistence:10
+  },
+
+  scenario1:"hint",
+  scenario2:"explain"
+
+};
+
+
+/* ==================================================
+   PRESETS
+================================================== */
+
+const presets = {
+
+  foundation:{
+    familiarity:20,
+    literacy:45,
+    tool:20,
+    partner:15,
+    guidance:50,
+    boundaries:[90,80,65,45,20,10,5,0],
+    priorities:[28,28,10,8,8,18]
+  },
+
+  socratic:{
+    familiarity:65,
+    literacy:80,
+    tool:60,
+    partner:65,
+    guidance:78,
+    boundaries:[95,98,92,72,62,35,18,5],
+    priorities:[25,18,12,18,10,17]
+  },
+
+  apprentice:{
+    familiarity:82,
+    literacy:92,
+    tool:82,
+    partner:78,
+    guidance:55,
+    boundaries:[95,90,88,82,78,55,42,18],
+    priorities:[22,18,16,20,14,10]
+  },
+
+  builder:{
+    familiarity:92,
+    literacy:94,
+    tool:96,
+    partner:90,
+    guidance:42,
+    boundaries:[98,90,88,90,92,85,82,60],
+    priorities:[16,12,22,24,18,8]
+  },
+
+  native:{
+    familiarity:98,
+    literacy:100,
+    tool:100,
+    partner:98,
+    guidance:28,
+    boundaries:[100,90,90,95,95,96,95,88],
+    priorities:[10,8,25,30,22,8]
+  }
+
+};
+
+
+/* ==================================================
+   PROFILES
+================================================== */
+
+const profiles = [
+
+  {
+    name:"Foundation Builder",
+    code:"FND-01",
+
+    desc:
+      "You place substantial emphasis on fundamentals, independent reasoning, and developing programming ability before making AI a central part of the workflow.",
+
+    score:s =>
+      (100-s.familiarity)*.18 +
+      (100-s.tool)*.15 +
+      (100-s.partner)*.15 +
+      s.literacy*.05 +
+      s.guidance*.07 +
+      s.priorities.fundamentals*.2 +
+      s.priorities.problem*.2
+  },
+
+
+  {
+    name:"Socratic AI Learner",
+    code:"SOC-02",
+
+    desc:
+      "You welcome AI as a learning companion, particularly for questions, hints, explanations, and reflection, while keeping the student's reasoning at the center.",
+
+    score:s =>
+      s.partner*.18 +
+      s.literacy*.16 +
+      s.guidance*.15 +
+      s.boundaries.question*.16 +
+      s.boundaries.hint*.14 +
+      (100-s.boundaries.generate)*.1 +
+      s.priorities.problem*.11
+  },
+
+
+  {
+    name:"AI Apprentice",
+    code:"APP-03",
+
+    desc:
+      "You want your child to learn modern AI workflows while preserving meaningful independent thinking, evaluation, and ownership of the work.",
+
+    score:s =>
+      s.familiarity*.15 +
+      s.literacy*.17 +
+      s.tool*.15 +
+      s.partner*.14 +
+      s.priorities.ai*.16 +
+      s.priorities.problem*.12 +
+      s.boundaries.debug*.11
+  },
+
+
+  {
+    name:"Creative AI Builder",
+    code:"BLD-04",
+
+    desc:
+      "You are comfortable with AI actively contributing to creation. The emphasis shifts toward building, iterating, evaluating, and turning ideas into working projects.",
+
+    score:s =>
+      s.tool*.18 +
+      s.partner*.18 +
+      s.boundaries.generate*.17 +
+      s.boundaries.suggest*.13 +
+      s.boundaries.debug*.1 +
+      s.priorities.projects*.12 +
+      s.priorities.creativity*.12
+  },
+
+
+  {
+    name:"AI-Native Creator",
+    code:"NAT-05",
+
+    desc:
+      "You see AI as a fundamental creative and technical medium. Your priority is learning how to direct, evaluate, verify, and build with increasingly capable systems.",
+
+    score:s =>
+      s.familiarity*.12 +
+      s.literacy*.17 +
+      s.tool*.17 +
+      s.partner*.16 +
+      s.boundaries.generate*.14 +
+      s.boundaries.project*.12 +
+      s.priorities.ai*.12
+  },
+
+
+  {
+    name:"Mentored Maker",
+    code:"MNT-06",
+
+    desc:
+      "You want modern AI tools available, but you also want an instructor to remain deeply involved in structure, feedback, and learning decisions.",
+
+    score:s =>
+      s.partner*.13 +
+      s.guidance*.26 +
+      s.boundaries.question*.12 +
+      s.boundaries.hint*.1 +
+      s.boundaries.debug*.08 +
+      s.priorities.problem*.12 +
+      s.priorities.projects*.09 +
+      s.priorities.fundamentals*.1
+  }
+
+];
+
+
+/* ==================================================
+   HELPERS
+================================================== */
+
+const $ = id => document.getElementById(id);
+
+const svgNS = "http://www.w3.org/2000/svg";
+
+const center = {
+  x:250,
+  y:250
+};
+
+const radius = 155;
+
+
+/* ==================================================
+   BUILD UI
+================================================== */
+
+function buildSliders(){
+
+  const p = $("philosophy");
+
+  dims.forEach(d => {
+
+    p.insertAdjacentHTML("beforeend",`
+
+      <div class="slider">
+
+        <div class="slider-title">
+
+          <span>${d.name}</span>
+
+          <span
+            class="value"
+            id="v-${d.id}"
+          >
+            ${state[d.id]}%
+          </span>
+
+        </div>
+
+        <div class="slider-desc">
+          ${d.desc}
+        </div>
+
+        <div class="ends">
+          <span>${d.left}</span>
+          <span>${d.right}</span>
+        </div>
+
+        <input
+          type="range"
+          min="0"
+          max="100"
+          value="${state[d.id]}"
+          id="i-${d.id}"
+          aria-label="${d.name}"
+        >
+
+      </div>
+
+    `);
+
+  });
+
+
+  $("guidance").insertAdjacentHTML("beforeend",`
+
+    <div class="slider">
+
+      <div class="slider-title">
+
+        <span>HUMAN GUIDANCE</span>
+
+        <span
+          class="value"
+          id="v-guidance"
+        >
+          ${state.guidance}%
+        </span>
+
+      </div>
+
+      <div class="slider-desc">
+        How much should a teacher remain involved in directing,
+        structuring, and reviewing the learning?
+      </div>
+
+      <div class="ends">
+        <span>SELF-DIRECTED</span>
+        <span>INSTRUCTOR-LED</span>
+      </div>
+
+      <input
+        type="range"
+        min="0"
+        max="100"
+        value="${state.guidance}"
+        id="i-guidance"
+        aria-label="Human guidance"
+      >
+
+    </div>
+
+  `);
+
+}
+
+
+function buildBoundaries(){
+
+  boundaryDefs.forEach(d => {
+
+    $("boundaries").insertAdjacentHTML("beforeend",`
+
+      <div class="slider">
+
+        <div class="slider-title">
+
+          <span>${d.name}</span>
+
+          <span
+            class="value"
+            id="v-${d.id}"
+          >
+            ${state.boundaries[d.id]}%
+          </span>
+
+        </div>
+
+        <div class="slider-desc">
+          ${d.desc}
+        </div>
+
+        <div class="ends">
+          <span>RARELY</span>
+          <span>COMFORTABLE</span>
+        </div>
+
+        <input
+          type="range"
+          min="0"
+          max="100"
+          value="${state.boundaries[d.id]}"
+          id="i-${d.id}"
+          aria-label="${d.name}"
+        >
+
+      </div>
+
+    `);
+
+  });
+
+}
+
+
+function buildPriorities(){
+
+  const labels = {
+
+    problem:"Problem solving",
+    fundamentals:"Programming fundamentals",
+    creativity:"Creativity",
+    ai:"AI literacy",
+    projects:"Project building",
+    persistence:"Persistence"
+
+  };
+
+
+  Object.keys(labels).forEach(k => {
+
+    $("priorities").insertAdjacentHTML("beforeend",`
+
+      <div class="priority">
+
+        <label>
+          ${labels[k]}
+        </label>
+
+        <input
+          type="range"
+          min="0"
+          max="50"
+          value="${state.priorities[k]}"
+          id="p-${k}"
+        >
+
+        <span id="pv-${k}">
+          ${state.priorities[k]}
+        </span>
+
+      </div>
+
+    `);
+
+  });
+
+}
+
+
+/* ==================================================
+   RANGE VISUALS
+================================================== */
+
+function setRangeStyle(el){
+
+  const pct =
+    (el.value-el.min) /
+    (el.max-el.min) *
+    100;
+
+  el.style.background =
+    `linear-gradient(
+      90deg,
+      #6cffb0 0%,
+      #6cffb0 ${pct}%,
+      #1b2739 ${pct}%,
+      #1b2739 100%
+    )`;
+}
+
+
+/* ==================================================
+   PROFILE CALCULATION
+================================================== */
+
+function profile(){
+
+  const ranked =
+    profiles
+      .map(p => ({
+        p,
+        score:p.score(state)
+      }))
+      .sort((a,b)=>b.score-a.score);
+
+  return {
+    primary:ranked[0].p,
+    secondary:ranked[1].p
+  };
+
+}
+
+
+/* ==================================================
+   INSIGHTS
+================================================== */
+
+function insightText(){
+
+  const s = state;
+
+  const out = [];
+
+
+  if(s.familiarity > 75){
+
+    out.push(
+      "<b>AI familiarity:</b> You are comfortable making AI a visible part of your child's education."
+    );
+
+  }
+
+  else if(s.familiarity < 30){
+
+    out.push(
+      "<b>AI familiarity:</b> You prefer a more cautious introduction to AI."
+    );
+
+  }
+
+
+  if(s.literacy > 75){
+
+    out.push(
+      "<b>AI literacy:</b> Understanding AI's strengths, limits, and evaluation is an important goal."
+    );
+
+  }
+
+
+  if(
+    s.boundaries.question > 80 &&
+    s.boundaries.generate < 35
+  ){
+
+    out.push(
+      "<b>Learning boundary:</b> You strongly favor AI guiding the student rather than doing substantial work for them."
+    );
+
+  }
+
+
+  if(
+    s.boundaries.generate > 70 ||
+    s.boundaries.project > 60
+  ){
+
+    out.push(
+      "<b>Creation boundary:</b> You are comfortable with AI producing meaningful project material."
+    );
+
+  }
+
+
+  if(s.guidance > 75){
+
+    out.push(
+      "<b>Instructor role:</b> You want human guidance to remain a major part of the learning environment."
+    );
+
+  }
+
+
+  if(s.priorities.problem >= 20){
+
+    out.push(
+      "<b>Educational priority:</b> Problem solving is one of your strongest stated goals."
+    );
+
+  }
+
+
+  if(s.priorities.ai >= 20){
+
+    out.push(
+      "<b>Educational priority:</b> AI literacy is itself a significant learning outcome."
+    );
+
+  }
+
+
+  return out.slice(0,4);
+
+}
+
+
+/* ==================================================
+   AI ROLE
+================================================== */
+
+function role(){
+
+  const pos =
+    state.familiarity*.18 +
+    state.partner*.22 +
+    state.boundaries.suggest*.12 +
+    state.boundaries.generate*.25 +
+    state.boundaries.project*.23;
+
+
+  let name;
+  let desc;
+
+
+  if(pos < 20){
+
+    name = "EXPLAINER";
+
+    desc =
+      "AI mainly clarifies concepts and provides information when needed.";
+
+  }
+
+  else if(pos < 40){
+
+    name = "TUTOR";
+
+    desc =
+      "AI mainly asks questions, explains concepts, and provides hints without simply doing the work.";
+
+  }
+
+  else if(pos < 60){
+
+    name = "COLLABORATOR";
+
+    desc =
+      "AI participates in brainstorming, exploration, debugging, and problem solving alongside the student.";
+
+  }
+
+  else if(pos < 80){
+
+    name = "DEVELOPMENT PARTNER";
+
+    desc =
+      "AI actively helps prototype, research, debug, generate, and iterate with the student.";
+
+  }
+
+  else{
+
+    name = "CREATOR";
+
+    desc =
+      "AI can produce substantial work while the student directs, evaluates, modifies, and tests the result.";
+
+  }
+
+
+  $("roleMarker").style.left = pos+"%";
+
+  $("roleFill").style.width = pos+"%";
+
+  $("roleName").textContent = name;
+
+  $("roleDescription").textContent = desc;
+
+}
+
+
+/* ==================================================
+   RADAR
+================================================== */
+
+function radar(){
+
+  const labels = [
+    "AI FAMILIARITY",
+    "AI LITERACY",
+    "AI TOOL",
+    "AI PARTNER",
+    "GUIDANCE"
+  ];
+
+
+  const vals = [
+
+    state.familiarity,
+    state.literacy,
+    state.tool,
+    state.partner,
+    state.guidance
+
+  ];
+
+
+  const angles =
+    vals.map(
+      (_,i) =>
+        -Math.PI/2 +
+        i*Math.PI*2/5
+    );
+
+
+  const pt = (i,v,r=radius) => ({
+
+    x:
+      center.x +
+      Math.cos(angles[i]) *
+      r *
+      v/100,
+
+    y:
+      center.y +
+      Math.sin(angles[i]) *
+      r *
+      v/100
+
+  });
+
+
+  $("grid").innerHTML = "";
+
+  $("axes").innerHTML = "";
+
+  $("labels").innerHTML = "";
+
+
+  /* Grid */
+
+  [20,40,60,80,100].forEach(v => {
+
+    const poly =
+      document.createElementNS(
+        svgNS,
+        "polygon"
+      );
+
+    poly.setAttribute(
+      "points",
+      vals
+        .map((_,i)=>{
+          const p = pt(i,v);
+          return `${p.x},${p.y}`;
+        })
+        .join(" ")
+    );
+
+    poly.setAttribute(
+      "class",
+      "gridline"
+    );
+
+    $("grid").appendChild(poly);
+
+  });
+
+
+  /* Axes */
+
+  vals.forEach((_,i)=>{
+
+    const end = pt(i,100);
+
+    const line =
+      document.createElementNS(
+        svgNS,
+        "line"
+      );
+
+    line.setAttribute(
+      "x1",
+      center.x
+    );
+
+    line.setAttribute(
+      "y1",
+      center.y
+    );
+
+    line.setAttribute(
+      "x2",
+      end.x
+    );
+
+    line.setAttribute(
+      "y2",
+      end.y
+    );
+
+    line.setAttribute(
+      "class",
+      "axis"
+    );
+
+    $("axes").appendChild(line);
+
+
+    const lp =
+      pt(i,100,190);
+
+    const t =
+      document.createElementNS(
+        svgNS,
+        "text"
+      );
+
+    t.setAttribute(
+      "x",
+      lp.x
+    );
+
+    t.setAttribute(
+      "y",
+      lp.y
+    );
+
+    t.setAttribute(
+      "text-anchor",
+      Math.abs(lp.x-center.x)<20
+        ? "middle"
+        : lp.x > center.x
+          ? "start"
+          : "end"
+    );
+
+    t.setAttribute(
+      "class",
+      "axis-label"
+    );
+
+    t.textContent =
+      labels[i];
+
+    $("labels").appendChild(t);
+
+  });
+
+
+  /* Shape */
+
+  const points =
+    vals
+      .map((v,i)=>{
+        const p = pt(i,v);
+        return `${p.x},${p.y}`;
+      })
+      .join(" ");
+
+
+  $("shape").setAttribute(
+    "d",
+    "M "+points+" Z"
+  );
+
+
+  /* Nodes */
+
+  $("nodes").innerHTML = "";
+
+
+  vals.forEach((v,i)=>{
+
+    const p = pt(i,v);
+
+    const c =
+      document.createElementNS(
+        svgNS,
+        "circle"
+      );
+
+    c.setAttribute(
+      "cx",
+      p.x
+    );
+
+    c.setAttribute(
+      "cy",
+      p.y
+    );
+
+    c.setAttribute(
+      "r",
+      5
+    );
+
+    c.setAttribute(
+      "class",
+      "node"
+    );
+
+    $("nodes").appendChild(c);
+
+  });
+
+}
+
+
+/* ==================================================
+   SCENARIOS
+================================================== */
+
+function updateScenarios(){
+
+  const s1 = {
+
+    independent:
+      "This emphasizes independent persistence before seeking external help.",
+
+    instructor:
+      "This emphasizes human mentorship and instructor judgment.",
+
+    hint:
+      "This emphasizes guided AI assistance without removing the student's responsibility for solving the problem.",
+
+    explain:
+      "This emphasizes using AI as an explanatory learning resource.",
+
+    solution:
+      "This is more comfortable with AI providing substantial assistance when the student can study the result."
+
+  };
+
+
+  const s2 = {
+
+    reject:
+      "This emphasizes understanding before accepting AI-generated work.",
+
+    explain:
+      "This emphasizes using AI to make generated work understandable before adopting it.",
+
+    test:
+      "This emphasizes evaluation through testing, modification, and experimentation.",
+
+    direct:
+      "This emphasizes effective direction and evaluation over understanding every implementation detail."
+
+  };
+
+
+  $("scenarioResult1").textContent =
+    s1[state.scenario1];
+
+  $("scenarioResult2").textContent =
+    s2[state.scenario2];
+
+}
+
+
+/* ==================================================
+   UPDATE
+================================================== */
+
+function update(){
+
+  /* Philosophy */
+
+  dims.forEach(d=>{
+
+    const el = $("i-"+d.id);
+
+    el.value =
+      state[d.id];
+
+    $("v-"+d.id).textContent =
+      state[d.id]+"%";
+
+    setRangeStyle(el);
+
+  });
+
+
+  /* Guidance */
+
+  const ge =
+    $("i-guidance");
+
+  ge.value =
+    state.guidance;
+
+  $("v-guidance").textContent =
+    state.guidance+"%";
+
+  setRangeStyle(ge);
+
+
+  /* Boundaries */
+
+  boundaryDefs.forEach(d=>{
+
+    const el =
+      $("i-"+d.id);
+
+    el.value =
+      state.boundaries[d.id];
+
+    $("v-"+d.id).textContent =
+      state.boundaries[d.id]+"%";
+
+    setRangeStyle(el);
+
+  });
+
+
+  /* Priorities */
+
+  Object.keys(state.priorities).forEach(k=>{
+
+    $("p-"+k).value =
+      state.priorities[k];
+
+    $("pv-"+k).textContent =
+      state.priorities[k];
+
+    setRangeStyle(
+      $("p-"+k)
+    );
+
+  });
+
+
+  const total =
+    Object.values(
+      state.priorities
+    ).reduce(
+      (a,b)=>a+b,
+      0
+    );
+
+
+  $("priorityTotal").textContent =
+    `TOTAL // ${total}${
+      total===100
+        ? ""
+        : " // ADJUST TO 100"
+    }`;
+
+
+  /* Profile */
+
+  const pr =
+    profile();
+
+
+  $("profileName").textContent =
+    pr.primary.name;
+
+  $("centerName").textContent =
+    pr.primary.name;
+
+  $("profileCode").textContent =
+    "PROFILE // "+
+    pr.primary.code;
+
+  $("profileDescription").textContent =
+    pr.primary.desc;
+
+
+  /* Insights */
+
+  $("insights").innerHTML =
+    insightText()
+      .map(
+        x =>
+          `<div class="insight">${x}</div>`
+      )
+      .join("");
+
+
+  /* Boundary summary */
+
+  $("boundarySummary").innerHTML =
+    boundaryDefs
+      .map(
+        d => `
+
+          <div class="boundary-row">
+
+            <div>
+
+              <div class="boundary-name">
+                ${d.name}
+              </div>
+
+              <div class="boundary-desc">
+                ${d.desc}
+              </div>
+
+            </div>
+
+            <div>
+
+              <div class="bar">
+
+                <i
+                  style="width:${state.boundaries[d.id]}%"
+                ></i>
+
+              </div>
+
+              <div class="bar-value">
+                ${state.boundaries[d.id]}%
+              </div>
+
+            </div>
+
+          </div>
+
+        `
+      )
+      .join("");
+
+
+  role();
+
+  radar();
+
+  updateScenarios();
+
+  chester();
+
+}
+
+
+/* ==================================================
+   CHESTER TRANSLATION
+================================================== */
+
+function chester(){
+
+  const s = state;
+
+  let t;
+
+
+  if(
+    s.boundaries.question > 80 &&
+    s.boundaries.generate < 35
+  ){
+
+    t =
+      "Your profile points toward a Socratic AI environment: AI can ask questions, explain concepts, and provide hints, while the student remains responsible for the reasoning and final work. This is a natural fit for an AI learning companion that resists simply giving answers.";
+
+  }
+
+
+  else if(
+    s.boundaries.generate > 70 &&
+    s.boundaries.project > 55
+  ){
+
+    t =
+      "Your profile points toward AI-assisted development: students can use AI to prototype, generate, debug, and iterate. The important educational question becomes whether they can evaluate, test, modify, and take ownership of what the system produces.";
+
+  }
+
+
+  else if(
+    s.guidance > 75
+  ){
+
+    t =
+      "Your profile points toward a highly mentored AI environment: modern tools can be present, but an instructor remains deeply involved in deciding when AI is useful, how it is used, and what the student should learn from the interaction.";
+
+  }
+
+
+  else{
+
+    t =
+      "Your profile points toward a blended environment. AI can support learning and creation, while the balance between independent problem solving, fundamentals, project building, and AI fluency can shift depending on the student's goals and stage.";
+
+  }
+
+
+  $("chesterText").textContent =
+    t;
+
+}
+
+
+/* ==================================================
+   EVENTS
+================================================== */
+
+function attach(){
+
+  /* Philosophy sliders */
+
+  dims.forEach(d=>{
+
+    $("i-"+d.id)
+      .addEventListener(
+        "input",
+        e=>{
+          state[d.id] =
+            +e.target.value;
+
+          update();
+        }
+      );
+
+  });
+
+
+  /* Guidance */
+
+  $("i-guidance")
+    .addEventListener(
+      "input",
+      e=>{
+
+        state.guidance =
+          +e.target.value;
+
+        update();
+
+      }
+    );
+
+
+  /* Boundary sliders */
+
+  boundaryDefs.forEach(d=>{
+
+    $("i-"+d.id)
+      .addEventListener(
+        "input",
+        e=>{
+
+          state.boundaries[d.id] =
+            +e.target.value;
+
+          update();
+
+        }
+      );
+
+  });
+
+
+  /* Priorities */
+
+  Object.keys(
+    state.priorities
+  ).forEach(k=>{
+
+    $("p-"+k)
+      .addEventListener(
+        "input",
+        e=>{
+
+          const old =
+            state.priorities[k];
+
+          const nv =
+            +e.target.value;
+
+          const delta =
+            nv-old;
+
+          state.priorities[k] =
+            nv;
+
+
+          const others =
+            Object.keys(
+              state.priorities
+            )
+            .filter(
+              x=>x!==k
+            );
+
+
+          const total =
+            others.reduce(
+              (a,x)=>
+                a+
+                state.priorities[x],
+              0
+            );
+
+
+          if(total>0){
+
+            others.forEach(x=>{
+
+              state.priorities[x] =
+                Math.max(
+                  0,
+                  Math.round(
+                    state.priorities[x] -
+                    delta *
+                    (
+                      state.priorities[x] /
+                      total
+                    )
+                  )
+                );
+
+            });
+
+          }
+
+
+          let sum =
+            Object.values(
+              state.priorities
+            )
+            .reduce(
+              (a,b)=>a+b,
+              0
+            );
+
+
+          let diff =
+            100-sum;
+
+
+          if(diff){
+
+            state.priorities[
+              others[0]
+            ] += diff;
+
+          }
+
+
+          update();
+
+        }
+      );
+
+  });
+
+
+  /* Presets */
+
+  document
+    .querySelectorAll(
+      "[data-preset]"
+    )
+    .forEach(b=>{
+
+      b.addEventListener(
+        "click",
+        ()=>{
+
+          const p =
+            presets[
+              b.dataset.preset
+            ];
+
+
+          state.familiarity =
+            p.familiarity;
+
+          state.literacy =
+            p.literacy;
+
+          state.tool =
+            p.tool;
+
+          state.partner =
+            p.partner;
+
+          state.guidance =
+            p.guidance;
+
+
+          boundaryDefs.forEach(
+            (d,i)=>
+              state.boundaries[d.id] =
+                p.boundaries[i]
+          );
+
+
+          Object.keys(
+            state.priorities
+          )
+          .forEach(
+            (k,i)=>
+              state.priorities[k] =
+                p.priorities[i]
+          );
+
+
+          update();
+
+        }
+      );
+
+    });
+
+
+  /* Reset */
+
+  $("reset").onclick = ()=>{
+
+    Object.assign(
+      state,
+      {
+        familiarity:55,
+        literacy:72,
+        tool:60,
+        partner:48,
+        guidance:60,
+        scenario1:"hint",
+        scenario2:"explain"
+      }
+    );
+
+
+    state.boundaries = {
+
+      explain:90,
+      question:92,
+      hint:88,
+      example:70,
+      debug:62,
+      suggest:35,
+      generate:22,
+      project:8
+
+    };
+
+
+    state.priorities = {
+
+      problem:24,
+      fundamentals:22,
+      creativity:15,
+      ai:16,
+      projects:13,
+      persistence:10
+
+    };
+
+
+    document
+      .querySelector(
+        'input[name="scenario"][value="hint"]'
+      )
+      .checked = true;
+
+
+    document
+      .querySelector(
+        'input[name="scenario2"][value="explain"]'
+      )
+      .checked = true;
+
+
+    update();
+
+  };
+
+
+  /* Randomize */
+
+  $("randomize").onclick = ()=>{
+
+    dims.forEach(
+      d =>
+        state[d.id] =
+          Math.floor(
+            Math.random()*101
+          )
+    );
+
+
+    state.guidance =
+      Math.floor(
+        Math.random()*101
+      );
+
+
+    boundaryDefs.forEach(
+      d =>
+        state.boundaries[d.id] =
+          Math.floor(
+            Math.random()*101
+          )
+    );
+
+
+    const keys =
+      Object.keys(
+        state.priorities
+      );
+
+
+    let remaining = 100;
+
+
+    keys.forEach(
+      (k,i)=>{
+
+        state.priorities[k] =
+          i===keys.length-1
+            ? remaining
+            : Math.floor(
+                Math.random() *
+                Math.min(
+                  30,
+                  remaining
+                )
+              );
+
+        remaining -=
+          state.priorities[k];
+
+      }
+    );
+
+
+    update();
+
+  };
+
+
+  /* Scenarios */
+
+  document
+    .querySelectorAll(
+      'input[type="radio"]'
+    )
+    .forEach(r=>{
+
+      r.addEventListener(
+        "change",
+        e=>{
+
+          if(
+            e.target.name ===
+            "scenario"
+          ){
+
+            state.scenario1 =
+              e.target.value;
+
+          }
+
+          else{
+
+            state.scenario2 =
+              e.target.value;
+
+          }
+
+
+          update();
+
+        }
+      );
+
+    });
+
+
+  /* Copy */
+
+  $("copy").onclick =
+    async ()=>{
+
+      const p =
+        profile().primary;
+
+
+      const text =
+
+`MY CODING WITH CHESTER AI LEARNING PROFILE
+
+${p.name}
+
+AI Familiarity: ${state.familiarity}%
+AI Literacy: ${state.literacy}%
+AI as a Tool: ${state.tool}%
+AI as Learning Partner: ${state.partner}%
+Human Guidance: ${state.guidance}%
+
+AI Boundaries
+
+Explain: ${state.boundaries.explain}%
+Hints: ${state.boundaries.hint}%
+Debug: ${state.boundaries.debug}%
+Generate Code: ${state.boundaries.generate}%
+Generate Projects: ${state.boundaries.project}%
+
+Scenario 1: ${state.scenario1}
+Scenario 2: ${state.scenario2}
+
+${p.desc}`;
+
+
+      try{
+
+        await navigator.clipboard
+          .writeText(text);
+
+        $("copy").textContent =
+          "COPIED ✓";
+
+
+        setTimeout(
+          () =>
+            $("copy").textContent =
+              "COPY MY PROFILE",
+          1800
+        );
+
+      }
+
+      catch{
+
+        prompt(
+          "Copy your profile:",
+          text
+        );
+
+      }
+
+    };
+
+}
+
+
+/* ==================================================
+   INIT
+================================================== */
+
+buildSliders();
+
+buildBoundaries();
+
+buildPriorities();
+
+attach();
+
+update();
+
+</script>
+
+</body>
+</html>
